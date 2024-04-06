@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>To-Do List</title>
+<style>
+    body {
+        background-color: cyan;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        font-size: 30pt;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+        width: calc(100% - 60px);
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+
+    button {
+        background-color: cyan;
+        color: #fff;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #0a7faf;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    li {
+        margin-bottom: 5px;
+    }
+
+    .delete-btn {
+        background-color: #ff4d4d;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .delete-btn:hover {
+        background-color: #f00;
+    }
+
+    .completed {
+        text-decoration: line-through;
+        color: #888;
+    }
+
+    .tab {
+        display: inline-block;
+        padding: 10px 20px;
+        cursor: pointer;
+        background-color: #0a7faf;
+        color: #fff;
+        border: none;
+        border-radius: 5px 5px 0 0;
+    }
+
+    .tab:hover {
+        background-color: #0c8dcf;
+    }
+
+    .active-tab {
+        background-color: #0c8dcf;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>To-Do List</h1>
+    <input type="text" id="taskInput" placeholder="Add a new task...">
+    <button onclick="addTask()">Add Task</button>
+    <div>
+        <button class="tab active-tab" onclick="filterTasks('all')">All Tasks</button>
+        <button class="tab" onclick="filterTasks('pending')">Pending Tasks</button>
+        <button class="tab" onclick="filterTasks('completed')">Completed Tasks</button>
+    </div>
+    <ul id="taskList"></ul>
+</div>
+<script>
+    let tasks = [];
+
+    function addTask() {
+        const taskInput = document.getElementById('taskInput');
+        const taskList = document.getElementById('taskList');
+
+        if (taskInput.value.trim() !== '') {
+            const task = {
+                id: Date.now(),
+                text: taskInput.value,
+                completed: false
+            };
+
+            tasks.push(task);
+            renderTasks(tasks, taskList);
+            taskInput.value = '';
+        } else {
+            alert('Please enter a task.');
+        }
+    }
+
+    function renderTasks(tasksArray, container) {
+        container.innerHTML = '';
+
+        tasksArray.forEach(task => {
+            const li = document.createElement('li');
+            li.textContent = task.text;
+
+            if (task.completed) {
+                li.classList.add('completed');
+            }
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.classList.add('delete-btn');
+            deleteBtn.onclick = function () {
+                deleteTask(task.id);
+            };
+
+            const completeBtn = document.createElement('button');
+            completeBtn.textContent = task.completed ? 'Undo' : 'Complete';
+            completeBtn.onclick = function () {
+                toggleTaskCompletion(task.id);
+            };
+
+            li.appendChild(completeBtn);
+            li.appendChild(deleteBtn);
+            container.appendChild(li);
+        });
+    }
+
+    function deleteTask(id) {
+        tasks = tasks.filter(task => task.id !== id);
+        renderTasks(tasks, document.getElementById('taskList'));
+    }
+
+    function toggleTaskCompletion(id) {
+        tasks = tasks.map(task => {
+            if (task.id === id) {
+                task.completed = !task.completed;
+            }
+            return task;
+        });
+        renderTasks(tasks, document.getElementById('taskList'));
+    }
+
+    function filterTasks(type) {
+        let filteredTasks = [];
+
+        if (type === 'all') {
+            filteredTasks = tasks;
+        } else if (type === 'pending') {
+            filteredTasks = tasks.filter(task => !task.completed);
+        } else if (type === 'completed') {
+            filteredTasks = tasks.filter(task => task.completed);
+        }
+
+        renderTasks(filteredTasks, document.getElementById('taskList'));
+    }
+</script>
+</body>
+</html>
